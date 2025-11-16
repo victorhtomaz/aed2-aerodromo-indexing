@@ -102,7 +102,7 @@ int processar_csv(const char *nome_arquivo, Registro **registros, int *num_regis
         if (!campo_valido(longitude_dms) || !campo_valido(latitude_dms))
             continue;
 
-        (*registros)[i].coordenadas = criar_coordenadas(longitude_dms, latitude_dms);
+        (*registros)[i].chave = criar_coordenadas(longitude_dms, latitude_dms);
         (*registros)[i].linha_tabela = linha_atual;
         i++;
     }
@@ -111,4 +111,24 @@ int processar_csv(const char *nome_arquivo, Registro **registros, int *num_regis
     fclose(arquivo);
     return 0;
 }
+
+int comparar_registros(const Registro *r1, const Registro *r2){
+    if (r1 == NULL || r2 == NULL)
+        return 0;
     
+    return comparar_chaves(&r1->chave, &r2->chave);
+}
+
+int comparar_chaves(const tchave *c1, const tchave *c2){
+    return comparar_coordenadas(c1, c2);
+}
+
+void liberar_registros(Registro **registros, int *num_registros) {
+    if (registros != NULL && *registros != NULL) {
+        free(*registros);
+        *registros = NULL;
+    }
+    
+    if (num_registros != NULL)
+        *num_registros = 0;
+}
