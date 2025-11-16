@@ -12,7 +12,8 @@ tnoe* cria_no(tno dados){
     no = (tnoe*) malloc(sizeof(tnoe));
     if (no == NULL)
         exit(0);
-    
+
+    no->chave = dados->chave;
     no->dados = dados;
     no->esq = NULL;
     no->dir = NULL;
@@ -33,8 +34,7 @@ int inserir(tnoe **no_atual, tno dados){
     }
     else{
         aux = *no_atual;
-        comparacao = comparar_chaves(&dados.chave, &aux->dados.chave);
-
+        comparacao = comparar_chaves(&dados->chave, &aux->dados->chave);
         if (comparacao == 0)
             return -1;
 
@@ -61,19 +61,19 @@ int inserir(tnoe **no_atual, tno dados){
     return 1;
 }
 
-int remover(tnoe *raiz, tnoe **no_atual, tno dados){
+int remover(tnoe *raiz, tnoe **no_atual, tchave chave){
     tnoe *aux, *sucessor, *ant_sucessor;
     int comparacao;
 
     aux = *no_atual;
-    comparacao = comparar_chaves(&dados.chave, &aux->dados.chave);
+    comparacao = comparar_chaves(&chave, &aux->chave);
 
     if (aux == NULL)
         return 0;
     else if (comparacao < 0)
-        remover(raiz, &(aux->esq), dados);
+        remover(raiz, &(aux->esq), chave);
     else if (comparacao > 0)
-        remover(raiz, &(aux->dir), dados);
+        remover(raiz, &(aux->dir), chave);
     else{
         /*Apagar sem filhos*/
         if (aux->esq == NULL && aux->dir == NULL)
@@ -108,10 +108,10 @@ int remover(tnoe *raiz, tnoe **no_atual, tno dados){
     return 1;
 }
 
-void print_chave(tno dados){
-    printf("Latitude: %f", dados.chave.latitude);
+void print_chave(tchave chave){
+    printf("Latitude: %f", chave.latitude);
     printf(" | ");
-    printf("Longitude: %f", dados.chave.longitude);
+    printf("Longitude: %f", chave.longitude);
 }
 
 void liberar_arvore(tnoe **raiz) {
@@ -130,7 +130,7 @@ void percorrer_em_ordem(tnoe *no){
         return;
 
     percorrer_em_ordem(no->esq);
-    print_chave(no->dados);
+    print_chave(no->chave);
     printf(";\n");
     percorrer_em_ordem(no->dir);
 }

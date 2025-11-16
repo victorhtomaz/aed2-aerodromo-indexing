@@ -20,7 +20,7 @@ int main(void){
     }
     
     for (i = 0; i < 10; i++){
-        inserir(&raiz, registros[i]);
+        inserir(&raiz, &registros[i]);
         coordenada_decimal_para_dms(registros[i].chave.longitude, LONGITUDE, longitude_dms);
         coordenada_decimal_para_dms(registros[i].chave.latitude, LATITUDE, latitude_dms);
 
@@ -34,6 +34,7 @@ int main(void){
     }
     percorrer_em_ordem(raiz);
     printf("\n");
+    liberar_arvore(&raiz);
     liberar_registros(&registros, &num_registros);
     return 0;
 }
