@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "arvore-bb.h"
+#include "arvore_bb.h"
 
 void criar_raiz(tnoe **raiz){
     *raiz = NULL;
@@ -11,9 +11,9 @@ tnoe* cria_no(tno dados){
 
     no = (tnoe*) malloc(sizeof(tnoe));
     if (no == NULL)
-        exit(0);
+        exit(1);
 
-    no->chave = dados->chave;
+    no->chave = dados.chave;
     no->dados = dados;
     no->esq = NULL;
     no->dir = NULL;
@@ -34,7 +34,7 @@ int inserir(tnoe **no_atual, tno dados){
     }
     else{
         aux = *no_atual;
-        comparacao = comparar_chaves(&dados->chave, &aux->dados->chave);
+        comparacao = comparar_chaves(&dados.chave, &aux->dados.chave);
         if (comparacao == 0)
             return -1;
 

@@ -3,7 +3,7 @@
 
 #include "gerenciador_csv.h"
 
-typedef Registro* tno;
+typedef Registro tno;
 
 typedef struct _tnoe{
     tchave chave;
