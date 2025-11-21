@@ -1,7 +1,7 @@
 #ifndef ARVORE_B_MAIS_H
 #define ARVORE_B_MAIS_H
 
-#define GRAU_MIN 5 // Se refere ao número mínimo de chaves por nó
+#define GRAU_MIN 2 /* Se refere ao número mínimo de chaves por nó */
 
 #include "gerenciador_csv.h"
 #include "auxiliar.h"
@@ -18,10 +18,10 @@ typedef struct _tnoe_b_mais{
     struct _tnoe_b_mais *proximo;
 } tnoe_b_mais;
 
-void criar_raiz(tnoe_b_mais **raiz);
-int arvore_vazia(tnoe_b_mais *arv);
-void liberar_arvore(tnoe_b_mais **raiz);
-int inserir(tnoe_b_mais **raiz, tno_b_mais dados);
-tnoe_b_mais* buscar(tnoe_b_mais *raiz, tchave chave);
+void criar_raiz_bm(tnoe_b_mais **raiz);
+int arvore_vazia_bm(tnoe_b_mais *arv);
+void liberar_arvore_bm(tnoe_b_mais **raiz);
+int inserir_bm(tnoe_b_mais **raiz, tno_b_mais dados);
+tnoe_b_mais* buscar_bm(tnoe_b_mais *raiz, tchave chave);
 
 #endif

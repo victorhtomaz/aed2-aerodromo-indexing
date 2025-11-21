@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "string.h"
 #include "arvore_b_mais.h"
 
-void criar_raiz(tnoe_b_mais **raiz){
+void criar_raiz_bm(tnoe_b_mais **raiz){
     *raiz = NULL;
 }
 
-tnoe_b_mais* cria_no(boolean e_folha){
+tnoe_b_mais* cria_no_bm(boolean e_folha){
     int i;
     tnoe_b_mais *no;
 
@@ -24,11 +25,11 @@ tnoe_b_mais* cria_no(boolean e_folha){
     return no;
 }
 
-int arvore_vazia(tnoe_b_mais *arv){
+int arvore_vazia_bm(tnoe_b_mais *arv){
     return (arv == NULL);
 }
 
-void liberar_arvore(tnoe_b_mais **raiz){
+void liberar_arvore_bm(tnoe_b_mais **raiz){
     int i;
     tnoe_b_mais *aux;
 
@@ -40,7 +41,7 @@ void liberar_arvore(tnoe_b_mais **raiz){
 
     if (aux->e_folha == FALSE){
         for (i = 0; i <= aux->num_chaves; i++){
-            liberar_arvore(&(aux->filhos[i]));
+            liberar_arvore_bm(&(aux->filhos[i]));
         }
     }
 
@@ -48,12 +49,102 @@ void liberar_arvore(tnoe_b_mais **raiz){
     *raiz = NULL;
 }
 
-void inserir_nao_cheio(tnoe_b_mais *no, tno_b_mais dados){
-    int i_vazio, comparacao;
+void split_folha(tnoe_b_mais *no, tno_b_mais dados, tchave *chave_promovida, tnoe_b_mais **novo_no){
+    int i;
+    tnoe_b_mais *nova_folha;
+    tchave chave_aux[2 * GRAU_MIN + 1];
+    tno_b_mais dados_aux[2 * GRAU_MIN + 1];
 
+    nova_folha = cria_no_bm(TRUE);
+
+    memcpy(chave_aux, no->chaves, no->num_chaves * sizeof(tchave));
+    memcpy(dados_aux, no->dados, no->num_chaves * sizeof(tno_b_mais));
+    
+    i = 2 * GRAU_MIN;
+    while (i > 0 && comparar_chaves(&dados.chave, &chave_aux[i - 1]) < 0){
+        chave_aux[i] = chave_aux[i - 1];
+        dados_aux[i] = dados_aux[i - 1];
+        i--;
+    }
+
+    chave_aux[i] = dados.chave;
+    dados_aux[i] = dados;
+
+    no->num_chaves = GRAU_MIN;
+    nova_folha->num_chaves = GRAU_MIN + 1;
+
+    memcpy(no->chaves, chave_aux, no->num_chaves * sizeof(tchave));
+    memcpy(no->dados, dados_aux, no->num_chaves * sizeof(tno_b_mais));
+
+    memcpy(nova_folha->chaves, &chave_aux[GRAU_MIN], nova_folha->num_chaves * sizeof(tchave));
+    memcpy(nova_folha->dados, &dados_aux[GRAU_MIN], nova_folha->num_chaves * sizeof(tno_b_mais));
+
+    nova_folha->proximo = no->proximo;
+    no->proximo = nova_folha;
+
+    *chave_promovida = nova_folha->chaves[0];
+    *novo_no = nova_folha;
+}
+
+void split_interno(tnoe_b_mais *no, tchave chave_split, tnoe_b_mais *novo_filho, tchave *chave_promovida, tnoe_b_mais **novo_no){
+    int i;
+    tnoe_b_mais *novo_interno;
+    tchave chave_aux[2 * GRAU_MIN + 1];
+    tnoe_b_mais *filhos_aux[2 * GRAU_MIN + 2];
+
+    novo_interno = cria_no_bm(FALSE);
+
+    memcpy(chave_aux, no->chaves, no->num_chaves * sizeof(tchave));
+    memcpy(filhos_aux, no->filhos, (no->num_chaves + 1) * sizeof(tnoe_b_mais*));
+
+    i = 2 * GRAU_MIN;
+    while (i > 0 && comparar_chaves(&chave_split, &chave_aux[i - 1]) < 0){
+        chave_aux[i] = chave_aux[i - 1];
+        filhos_aux[i + 1] = filhos_aux[i];
+        i--;
+    }
+
+    chave_aux[i] = chave_split;
+    filhos_aux[i + 1] = novo_filho;
+
+    *chave_promovida = chave_aux[GRAU_MIN];
+    
+    no->num_chaves = GRAU_MIN;
+    novo_interno->num_chaves = GRAU_MIN;
+
+    memcpy(no->chaves, chave_aux, no->num_chaves * sizeof(tchave));
+    memcpy(no->filhos, filhos_aux, (no->num_chaves + 1) * sizeof(tnoe_b_mais*));
+
+    memcpy(novo_interno->chaves, &chave_aux[GRAU_MIN + 1], novo_interno->num_chaves * sizeof(tchave));
+    memcpy(novo_interno->filhos, &filhos_aux[GRAU_MIN + 1], (novo_interno->num_chaves + 1) * sizeof(tnoe_b_mais*));
+
+    *novo_no = novo_interno;
+}
+
+int inserir_em_no(tnoe_b_mais *no, tno_b_mais dados, tchave *chave_promovida, tnoe_b_mais **novo_no){
+    int i_vazio, i, j, split_realizado;
+    tchave chave_split;
+    tnoe_b_mais *novo_filho;
+
+    novo_filho = NULL;
     i_vazio = no->num_chaves;
 
     if (no->e_folha){
+        i = 0;
+        
+        while (i < no->num_chaves && comparar_chaves(&dados.chave, &no->chaves[i]) > 0)
+            i++;
+        
+
+        if (i < no->num_chaves && comparar_chaves(&dados.chave, &no->chaves[i]) == 0) 
+            return -1;
+        
+
+        /* Split nó folha se estiver cheio */
+        if (no->num_chaves == 2 * GRAU_MIN){
+            split_folha(no, dados, chave_promovida, novo_no);
+            return 1;
+        }
 
         while (i_vazio > 0 && comparar_chaves(&dados.chave, &no->chaves[i_vazio - 1]) < 0){
             no->chaves[i_vazio] = no->chaves[i_vazio - 1];
@@ -65,23 +156,54 @@ void inserir_nao_cheio(tnoe_b_mais *no, tno_b_mais dados){
         no->chaves[i_vazio] = dados.chave;
         no->dados[i_vazio] = dados;
         no->num_chaves++;
+
+        return 0;
     }
     else{
+        i = 0;
+        j = no->num_chaves;
 
+        while (i < no->num_chaves && comparar_chaves(&dados.chave, &no->chaves[i]) > 0)
+            i++;
+        
+        
+        split_realizado = inserir_em_no(no->filhos[i], dados, &chave_split, &novo_filho);
+
+        if (split_realizado == -1)
+            return -1;
+
+        if (split_realizado == 0)
+            return 0;
+        
+        /* Split nó interno se estiver cheio */
+        if (no->num_chaves == 2 * GRAU_MIN){
+            split_interno(no, chave_split, novo_filho, chave_promovida, novo_no);
+            return 1;
+        }
+
+        while (j > i){
+            no->chaves[j] = no->chaves[j - 1];
+            no->filhos[j + 1] = no->filhos[j];
+            j--;
+        }
+
+        no->chaves[i] = chave_split;
+        no->filhos[i + 1] = novo_filho;
+
+        no->num_chaves++;
+        return 0;
     }
 }
 
-int inserir_em_no(); // Implementar
+int inserir_bm(tnoe_b_mais **raiz, tno_b_mais dados){
+    int split_realizado;
+    tnoe_b_mais *aux, *nova_raiz, *novo_filho;
+    tchave chave_split;
 
-int inserir(tnoe_b_mais **raiz, tno_b_mais dados){
-    int comparacao, indice_filho;
-    tnoe_b_mais *aux, *nova_raiz;
-
-    indice_filho = 0;
     aux = *raiz;
 
-    if (arvore_vazia(aux)){
-        aux = cria_no(TRUE);
+    if (arvore_vazia_bm(aux)){
+        aux = cria_no_bm(TRUE);
         aux->chaves[0] = dados.chave;
         aux->dados[0] = dados;
         aux->num_chaves = 1;
@@ -90,22 +212,20 @@ int inserir(tnoe_b_mais **raiz, tno_b_mais dados){
         return 1;
     }
     
-    if (aux->num_chaves == (2 * GRAU_MIN)){
-        nova_raiz = cria_no(FALSE);
+    split_realizado = inserir_em_no(aux, dados, &chave_split, &novo_filho);
+
+    if (split_realizado == -1)
+        return 0;
+
+    if (split_realizado == 1){
+        nova_raiz = cria_no_bm(FALSE);
+
+        nova_raiz->num_chaves = 1;
+        nova_raiz->chaves[0] = chave_split;
+        nova_raiz->filhos[0] = aux;
+        nova_raiz->filhos[1] = novo_filho;
 
         *raiz = nova_raiz;
-        nova_raiz->filhos[0] = aux;
-
-        split();
-
-        comparacao = comparar_chaves(&dados.chave, &nova_raiz->chaves[0]);
-        if (comparacao > 0)
-            indice_filho++;
-
-        inserir_nao_cheio(nova_raiz->filhos[indice_filho], dados);
-    }
-    else{
-        inserir_nao_cheio(aux, dados);
     }
 
     return 1;
