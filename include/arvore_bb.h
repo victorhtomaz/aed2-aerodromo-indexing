@@ -14,9 +14,11 @@ typedef struct _tnoe{
 void criar_raiz(tnoe **raiz);
 int arvore_vazia(tnoe *arv);
 int inserir(tnoe **no_atual, tno dados);
-int remover(tnoe *raiz, tnoe **no_atual, tchave chave); /*mudar para tchave*/
+int remover(tnoe *raiz, tnoe **no_atual, tchave chave);
 void print_chave(tchave chave);
 void liberar_arvore(tnoe **raiz);
-void percorrer_em_ordem(tnoe *no);
+void percorrer_em_ordem(tnoe *no, Registro **registros);
+tno* buscar(tnoe *raiz, tchave chave);
+int contar_nos(tnoe *no);
 
 #endif

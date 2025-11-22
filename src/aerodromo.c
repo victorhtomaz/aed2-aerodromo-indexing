@@ -22,25 +22,62 @@ void inicializar_aerodromo(Aerodromo* aerodromo) {
     aerodromo->regras_de_voo = DESCONHECIDO;
 }
 
+void normalizar_dms(const char *entrada, char *saida) {
+    size_t i, j, inicio, fim, len;
+    
+    len = strlen(entrada);
+    j = 0;
+    inicio = 0;
+    fim = len;
+
+    if (len >= 2 && entrada[0] == '\"' && entrada[len-1] == '\"') {
+        inicio = 1;
+        fim = len - 1;
+    }
+
+    for (i = inicio; i < fim; i++) {
+        if (entrada[i] == '\"') {
+            if (i + 1 < fim && entrada[i+1] == '\"') {
+                saida[j++] = '\"';
+                i++;
+            } else 
+                saida[j++] = '\"';
+        } 
+        else if (entrada[i] == ',')
+            saida[j++] = '.';
+        
+        else if (!isspace(entrada[i])) 
+            saida[j++] = entrada[i];
+        
+    }
+    saida[j] = '\0';
+}
+
+void normalizar_regra_de_voo(const char* entrada, char* saida) {
+    size_t i, j, len;
+    
+    len = strlen(entrada);
+    j = 0;
+    for (i = 0; i < len; i++) 
+        if (!isspace(entrada[i])) 
+            saida[j++] = entrada[i];
+        
+    saida[j] = '\0';
+}
+
 double dms_para_decimal(const char* dms) {
     int graus, minutos;
     double segundos, resultado;
-    char direcao, *dms_aux, *p;
+    char direcao, *dms_aux;
 
     dms_aux = malloc(strlen(dms) + 1);
     if (dms_aux == NULL) {
         return 0.0;
     }
     
-    strcpy(dms_aux, dms);
+    normalizar_dms(dms, dms_aux);
 
-    for (p = dms_aux; *p; ++p) {
-        if (*p == ',') {
-            *p = '.';
-        }
-    }
-
-    sscanf(dms_aux, "\"%d°%d'%lf\"\"%c\"", &graus, &minutos, &segundos, &direcao);
+    sscanf(dms_aux, "%d°%d'%lf\"%c", &graus, &minutos, &segundos, &direcao);
     resultado = graus + (minutos / 60.0) + (segundos / 3600.0);
 
     direcao = toupper(direcao);
@@ -67,17 +104,24 @@ Coordenadas criar_coordenadas(const char* longitude_dms, const char* latitude_dm
 }
 
 RegrasDeVoo criar_regra_de_voo(const char* regra_de_voo_str){
-    if (strcmp(regra_de_voo_str, "VFR") == 0) {
+    char *regra_aux;
+
+    regra_aux = malloc(strlen(regra_de_voo_str) + 1);
+
+    normalizar_regra_de_voo(regra_de_voo_str, regra_aux);
+
+    if (strcmp(regra_aux, "VFR") == 0) {
         return VFR;
     }
     
-    if (strcmp(regra_de_voo_str, "IFR") == 0) {
+    if (strcmp(regra_aux, "IFR") == 0) {
         return IFR;
     }
-    if (strcmp(regra_de_voo_str, "VFR/IFR") == 0) {
+    if (strcmp(regra_aux, "VFR/IFR") == 0) {
         return VFR_IFR;
     }
 
+    free(regra_aux);
     return DESCONHECIDO;
 }
 

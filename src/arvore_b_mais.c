@@ -230,3 +230,75 @@ int inserir_bm(tnoe_b_mais **raiz, tno_b_mais dados){
 
     return 1;
 }
+
+tno_b_mais* buscar_bm(tnoe_b_mais *no, tchave chave){
+    int i, comparacao;
+
+    if (no == NULL)
+        return NULL;
+
+    i = 0;
+
+    if (no->e_folha == FALSE){
+        while (i < no->num_chaves && comparar_chaves(&chave, &no->chaves[i]) >= 0)
+            i++;
+
+        return buscar_bm(no->filhos[i], chave);
+    }
+
+    while (i < no->num_chaves){
+        comparacao = comparar_chaves(&chave, &no->chaves[i]);
+
+        if (comparacao < 0)
+            return NULL;
+        
+        if (comparacao == 0)
+            return &no->dados[i];
+   
+        i++;
+    }
+    
+    return NULL;
+}
+
+void percorrer_em_ordem_bm(tnoe_b_mais *raiz, tno_b_mais **registros){
+    int i;
+    tnoe_b_mais *aux;
+
+    aux = raiz;
+
+    if (aux == NULL)
+        return;
+
+    while (aux->e_folha == FALSE) {
+        aux = aux->filhos[0];
+    }
+
+    while (aux != NULL) {
+        for (i = 0; i < aux->num_chaves; i++) {
+            (*registros)->chave = aux->chaves[i];
+            (*registros)->linha_tabela = aux->dados[i].linha_tabela;
+            (*registros)++;
+        }
+        aux = aux->proximo;
+    }
+}
+
+int contar_chaves_bm(tnoe_b_mais *raiz){
+    tnoe_b_mais *aux = raiz;
+    int total_dados = 0;
+
+    if (aux == NULL) 
+        return 0;
+
+    while (aux->e_folha == FALSE) {
+        aux = aux->filhos[0];
+    }
+
+    while (aux != NULL) {
+        total_dados += aux->num_chaves;
+        aux = aux->proximo;
+    }
+
+    return total_dados;
+}

@@ -1,7 +1,7 @@
 #ifndef ARVORE_B_MAIS_H
 #define ARVORE_B_MAIS_H
 
-#define GRAU_MIN 2 /* Se refere ao número mínimo de chaves por nó */
+#define GRAU_MIN 10 /* Se refere ao número mínimo de chaves por nó */
 
 #include "gerenciador_csv.h"
 #include "auxiliar.h"
@@ -22,6 +22,7 @@ void criar_raiz_bm(tnoe_b_mais **raiz);
 int arvore_vazia_bm(tnoe_b_mais *arv);
 void liberar_arvore_bm(tnoe_b_mais **raiz);
 int inserir_bm(tnoe_b_mais **raiz, tno_b_mais dados);
-tnoe_b_mais* buscar_bm(tnoe_b_mais *raiz, tchave chave);
-
+tno_b_mais* buscar_bm(tnoe_b_mais *raiz, tchave chave);
+void percorrer_em_ordem_bm(tnoe_b_mais *raiz, tno_b_mais **registros);
+int contar_chaves_bm(tnoe_b_mais *raiz);
 #endif

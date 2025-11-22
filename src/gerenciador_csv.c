@@ -6,16 +6,14 @@
 
 #define TAM_MAX_LINHA 1024
 
-void limpar_recursos(FILE *arquivo, Registro **registros, int *num_registros){
-    if (arquivo != NULL)
-        fclose(arquivo);
-
-    if (*registros != NULL){
+void liberar_registros(Registro **registros, int *num_registros) {
+    if (registros != NULL && *registros != NULL) {
         free(*registros);
         *registros = NULL;
     }
     
-    *num_registros = 0;
+    if (num_registros != NULL)
+        *num_registros = 0;
 }
 
 int contar_numero_de_linhas(FILE *arquivo){
@@ -53,23 +51,19 @@ int campo_valido(const char *campo) {
     return (campo != NULL && strlen(campo) > 0);
 }
 
-int processar_csv(const char *nome_arquivo, Registro **registros, int *num_registros){
+int processar_csv(FILE *arquivo, Registro **registros, int *num_registros){
     int numero_linhas, numero_colunas, linha_atual, coluna_atual, i;
     char linha[TAM_MAX_LINHA];
     char *p_linha, *campo, *longitude_dms, *latitude_dms;
-    FILE *arquivo;
 
-    arquivo = fopen(nome_arquivo, "r");
-    if (arquivo == NULL){
-        limpar_recursos(arquivo, registros, num_registros);
+    if (arquivo == NULL)
         return -1;
-    }
 
     numero_linhas = contar_numero_de_linhas(arquivo);
 
     *registros = (Registro *) malloc((numero_linhas - 1) * sizeof(Registro));
     if (*registros == NULL){
-        limpar_recursos(arquivo, registros, num_registros);
+        liberar_registros(registros, num_registros);
         return -1;
     }
 
@@ -77,7 +71,7 @@ int processar_csv(const char *nome_arquivo, Registro **registros, int *num_regis
 
     numero_colunas = contar_numero_de_colunas(arquivo);
     if (numero_colunas != NUMERO_COLUNAS_CSV){
-        limpar_recursos(arquivo, registros, num_registros);
+        liberar_registros(registros, num_registros);
         return -1;
     }
 
@@ -108,7 +102,6 @@ int processar_csv(const char *nome_arquivo, Registro **registros, int *num_regis
     }
     
     *num_registros = i;
-    fclose(arquivo);
     return 0;
 }
 
@@ -123,12 +116,81 @@ int comparar_chaves(const tchave *c1, const tchave *c2){
     return comparar_coordenadas(c1, c2);
 }
 
-void liberar_registros(Registro **registros, int *num_registros) {
-    if (registros != NULL && *registros != NULL) {
-        free(*registros);
-        *registros = NULL;
-    }
+int ler_linha_csv(FILE *arquivo, Aerodromo *aerodromo, int linha_tabela){
+    int linha_atual, coluna_atual;
+    char linha[TAM_MAX_LINHA];
+    char *p_linha, *campo, *longitude_dms, *latitude_dms;
+
+    if (arquivo == NULL)
+        return 0;
     
-    if (num_registros != NULL)
-        *num_registros = 0;
+
+    rewind(arquivo);
+
+    linha_atual = 0;
+    while (fgets(linha, TAM_MAX_LINHA, arquivo) != NULL){
+        if (linha_atual < linha_tabela){
+            linha_atual++;
+            continue;
+        }
+        p_linha = linha;
+
+        for (coluna_atual = 0; coluna_atual < NUMERO_COLUNAS_CSV; coluna_atual++){
+            campo = separar_string(&p_linha, SEPARADOR_CSV);
+
+            switch (coluna_atual){
+            case COLUNA_CODIGO_OACI:
+                strncpy(aerodromo->codigo_oaci, campo, sizeof(aerodromo->codigo_oaci));
+                break;
+            case COLUNA_NOME:
+                if (!campo_valido(campo))
+                    return 0;
+                strncpy(aerodromo->nome, campo, sizeof(aerodromo->nome));
+                break;
+            case COLUNA_MUNICIPIO:
+                if (!campo_valido(campo))
+                    return 0;
+                strncpy(aerodromo->municipio, campo, sizeof(aerodromo->municipio));
+                break;
+            case COLUNA_UF:
+                if (!campo_valido(campo))
+                    return 0;
+                strncpy(aerodromo->uf, campo, sizeof(aerodromo->uf));
+                break;
+            case COLUNA_LONGITUDE:
+                if (!campo_valido(campo))
+                    return 0;
+                longitude_dms = campo;
+                break;
+            case COLUNA_LATITUDE:
+                if (!campo_valido(campo))
+                    return 0;
+                latitude_dms = campo;
+                break;
+            case COLUNA_ALTITUDE:
+                if (!campo_valido(campo))
+                    return 0;
+                aerodromo->altitude_em_metros = atoi(campo);
+                break;
+            case COLUNA_OPERACAO_D:
+                aerodromo->regras_de_voo = criar_regra_de_voo(campo);
+                break;
+            case COLUNA_COMPRIMENTO:
+                if (!campo_valido(campo))
+                    return 0;
+                aerodromo->comprimento_em_metros = atoi(campo);
+                break;
+            case COLUNA_LARGURA:
+                if (!campo_valido(campo))
+                    return 0;
+                aerodromo->largura_em_metros = atoi(campo);
+                break;
+            default:
+                break;
+            }
+        }
+        aerodromo->coordenadas = criar_coordenadas(longitude_dms, latitude_dms);
+        break;
+    }
+    return 1;
 }

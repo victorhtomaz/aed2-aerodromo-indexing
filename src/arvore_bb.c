@@ -125,12 +125,37 @@ void liberar_arvore(tnoe **raiz) {
     *raiz = NULL;
 }
 
-void percorrer_em_ordem(tnoe *no){
+void percorrer_em_ordem(tnoe *no, tno **registros){
     if (no == NULL)
         return;
 
-    percorrer_em_ordem(no->esq);
-    print_chave(no->chave);
-    printf(";\n");
-    percorrer_em_ordem(no->dir);
+    percorrer_em_ordem(no->esq, registros);
+    (*registros)->chave = no->chave;
+    (*registros)->linha_tabela = no->dados.linha_tabela;
+    (*registros)++;
+    percorrer_em_ordem(no->dir, registros);
+}
+
+tno* buscar(tnoe *raiz, tchave chave){
+    int comparacao;
+
+    if (raiz == NULL)
+        return NULL;
+    
+    comparacao = comparar_chaves(&chave, &raiz->chave);
+
+    if (comparacao > 0)
+        return buscar(raiz->dir, chave);
+    
+    if (comparacao < 0)
+        return buscar(raiz->esq, chave);
+    
+    return &raiz->dados;
+}
+
+int contar_nos(tnoe *no){
+    if (no == NULL) 
+        return 0;
+
+    return 1 + contar_nos(no->esq) + contar_nos(no->dir);
 }
