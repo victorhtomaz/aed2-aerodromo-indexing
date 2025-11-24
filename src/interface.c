@@ -110,7 +110,7 @@ void buscar_aerodromo_bb(FILE *arquivo_csv, tnoe *raiz_bb){
     ler_linha_csv(arquivo_csv, &aerodromo, registro_encontrado->linha_tabela);
     
     printf("==================================================\n");
-    printf("Aerdódromo: \n");
+    printf("Aeródromo: \n");
     imprimir_aerodromo(&aerodromo);
 }
 
@@ -159,7 +159,7 @@ void buscar_aerodromo_b_mais(FILE *arquivo_csv, tnoe_b_mais *raiz_b_mais){
     ler_linha_csv(arquivo_csv, &aerodromo, registro_encontrado->linha_tabela);
     
     printf("==================================================\n");
-    printf("Aerdódromo: \n");
+    printf("Aeródromo: \n");
     imprimir_aerodromo(&aerodromo);
 }
 
@@ -187,13 +187,13 @@ void gerar_relatorio_paginado(FILE *arquivo_csv, tnoe_b_mais *raiz_b_mais){
     }
 
     quantidade_chaves = contar_chaves_bm(raiz_b_mais);
-    quantidade_paginas = (quantidade_chaves + REGISTROS_POR_PAGINA - 1) / REGISTROS_POR_PAGINA;
+    quantidade_paginas = (quantidade_chaves + (REGISTROS_POR_PAGINA) - 1) / (REGISTROS_POR_PAGINA);
 
     numero_da_pagina = 1;
     while (i){
         limpar_tela();
         printf("==================================================\n");
-        printf("Relátorio paginado - Página %d: \n", numero_da_pagina);
+        printf("Relatório paginado - Página %d (Total: %d)\n", numero_da_pagina, quantidade_paginas);
         imprimir_relatorio_paginado(arquivo_csv, raiz_b_mais, numero_da_pagina);
 
         printf("==================================================\n");
@@ -238,12 +238,12 @@ void gerar_relatorio_paginado_busca(FILE *arquivo_csv, tnoe_b_mais *raiz_b_mais)
     limpar_tela();
 
     if (raiz_b_mais == NULL){
-        printf("A árvore B+ está vazia, não é possível gerar o relátorio. Garanta que carregou o arquivo CSV.\n");
+        printf("A árvore B+ está vazia, não é possível gerar o relatório. Garanta que carregou o arquivo CSV.\n");
         return;
     }
 
     quantidade_chaves = contar_chaves_bm(raiz_b_mais);
-    quantidade_paginas = quantidade_chaves / (REGISTROS_POR_PAGINA);
+    quantidade_paginas = (quantidade_chaves + (REGISTROS_POR_PAGINA) - 1) / (REGISTROS_POR_PAGINA);
 
     i = 1;
     do {
@@ -261,7 +261,7 @@ void gerar_relatorio_paginado_busca(FILE *arquivo_csv, tnoe_b_mais *raiz_b_mais)
             i = 0;
     } while(i);
 
-    printf("Relátorio paginado - Página %d: \n", numero_da_pagina);
+    printf("Relatório paginado - Página %d: \n", numero_da_pagina);
     imprimir_relatorio_paginado(arquivo_csv, raiz_b_mais, numero_da_pagina);
 }
 
@@ -334,9 +334,9 @@ void exibir_opcoes(){
     printf("1 - Carregar arquivo CSV\n");
     printf("2 - Busca por Aerodromo (árvore binária de busca)\n");
     printf("3 - Busca por Aerodromo (árvore B+)\n");
-    printf("4 - Gerar relátorio (árvore B+)\n");
-    printf("5 - Gerar relátorio paginado (árvore B+)\n");
-    printf("6 - Gerar relátorio - buscar página (árvore B+)\n");
+    printf("4 - Gerar relatório (árvore B+)\n");
+    printf("5 - Gerar relatório paginado (árvore B+)\n");
+    printf("6 - Gerar relatório - buscar página (árvore B+)\n");
     printf("0 - Sair\n\n");
     printf("Opção: ");
 }
