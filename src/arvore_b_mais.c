@@ -243,17 +243,21 @@ tno_b_mais* buscar_bm(tnoe_b_mais *no, tchave chave){
         while (i < no->num_chaves && comparar_chaves(&chave, &no->chaves[i]) >= 0)
             i++;
 
+        printf("Nó interno: 1° chave:  Lat: %.6f, Long: %.6f\n", no->chaves[0].latitude, no->chaves[0].longitude);
         return buscar_bm(no->filhos[i], chave);
     }
 
     while (i < no->num_chaves){
+        printf("Nó folha: %d° chave:  Lat: %.6f, Long: %.6f\n", i+1, no->chaves[i].latitude, no->chaves[i].longitude);
         comparacao = comparar_chaves(&chave, &no->chaves[i]);
 
         if (comparacao < 0)
             return NULL;
         
-        if (comparacao == 0)
+        if (comparacao == 0){
+            printf("Chave encontrada: Lat: %.6f, Long: %.6f\n", no->chaves[i].latitude, no->chaves[i].longitude);
             return &no->dados[i];
+        }
    
         i++;
     }

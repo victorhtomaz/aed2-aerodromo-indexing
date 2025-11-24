@@ -25,7 +25,7 @@ typedef struct _aerodromo{
     char municipio[255];
     char uf[3];
     int altitude_em_metros;
-    RegrasDeVoo regras_de_voo;
+    RegrasDeVoo operacao_diurna;
     int comprimento_em_metros;
     int largura_em_metros;
 } Aerodromo;

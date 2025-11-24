@@ -19,11 +19,12 @@ void inicializar_aerodromo(Aerodromo* aerodromo) {
     aerodromo->altitude_em_metros = 0;
     aerodromo->comprimento_em_metros = 0;
     aerodromo->largura_em_metros = 0;
-    aerodromo->regras_de_voo = DESCONHECIDO;
+    aerodromo->operacao_diurna = DESCONHECIDO;
 }
 
 void normalizar_dms(const char *entrada, char *saida) {
     size_t i, j, inicio, fim, len;
+    char c;
     
     len = strlen(entrada);
     j = 0;
@@ -36,19 +37,37 @@ void normalizar_dms(const char *entrada, char *saida) {
     }
 
     for (i = inicio; i < fim; i++) {
-        if (entrada[i] == '\"') {
+        c = entrada[i];
+
+        if (c == '\"') {
             if (i + 1 < fim && entrada[i+1] == '\"') {
                 saida[j++] = '\"';
                 i++;
-            } else 
+            } else {
                 saida[j++] = '\"';
+            }
         } 
-        else if (entrada[i] == ',')
+        
+        else if (c == ',') {
             saida[j++] = '.';
+        }
         
-        else if (!isspace(entrada[i])) 
-            saida[j++] = entrada[i];
-        
+        else {
+            if (isdigit((unsigned char)c)) {
+                saida[j++] = c;
+            }
+            else if (c == '.' || c == '\'' || c == '-') {
+                saida[j++] = c;
+            }
+            else if (strchr("NSEWnsew", c)) {
+                saida[j++] = toupper(c);
+            }
+            
+            else if (!isalnum((unsigned char)c) && !isspace((unsigned char)c)) {
+                saida[j++] = c;
+            }
+            
+        }
     }
     saida[j] = '\0';
 }
@@ -69,6 +88,10 @@ double dms_para_decimal(const char* dms) {
     int graus, minutos;
     double segundos, resultado;
     char direcao, *dms_aux;
+
+    graus = 0;
+    minutos = 0;
+    segundos = 0.0;
 
     dms_aux = malloc(strlen(dms) + 1);
     if (dms_aux == NULL) {
@@ -204,15 +227,15 @@ void imprimir_aerodromo(const Aerodromo* aerodromo){
     coordenada_decimal_para_dms(aerodromo->coordenadas.longitude, LONGITUDE, longitude_dms);
     coordenada_decimal_para_dms(aerodromo->coordenadas.latitude, LATITUDE, latitude_dms);
 
+    printf("Latitude: %s\n", latitude_dms);
+    printf("Longitude: %s\n", longitude_dms);
     printf("Código OACI: %s\n", aerodromo->codigo_oaci);
     printf("Nome: %s\n", aerodromo->nome);
     printf("Município: %s\n", aerodromo->municipio);
     printf("UF: %s\n", aerodromo->uf);
-    printf("Longitude: %s\n", longitude_dms);
-    printf("Latitude: %s\n", latitude_dms);
     printf("Altitude: %dm\n", aerodromo->altitude_em_metros);
-    printf("Regras de voo: ");
-    print_regra_de_voo(aerodromo->regras_de_voo);
+    printf("Operação diurna: ");
+    print_regra_de_voo(aerodromo->operacao_diurna);
     printf("Comprimento: %dm\n", aerodromo->comprimento_em_metros);
     printf("Largura: %dm\n", aerodromo->largura_em_metros);
 }

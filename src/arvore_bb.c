@@ -144,12 +144,17 @@ tno* buscar(tnoe *raiz, tchave chave){
     
     comparacao = comparar_chaves(&chave, &raiz->chave);
 
-    if (comparacao > 0)
+    if (comparacao > 0){
+        printf("Chave: Lat: %.6f, Long: %.6f > Nó Atual: Lat: %.6f, Long: %.6f\n", chave.latitude, chave.longitude, raiz->chave.latitude, raiz->chave.longitude);
         return buscar(raiz->dir, chave);
+    }
     
-    if (comparacao < 0)
+    if (comparacao < 0){
+        printf("Chave: Lat: %.6f, Long: %.6f < Nó Atual: Lat: %.6f, Long: %.6f\n", chave.latitude, chave.longitude, raiz->chave.latitude, raiz->chave.longitude);
         return buscar(raiz->esq, chave);
+    }
     
+    printf("Chave encontrada: Lat: %.6f, Long: %.6f\n", raiz->chave.latitude, raiz->chave.longitude);
     return &raiz->dados;
 }
 

@@ -124,7 +124,6 @@ int ler_linha_csv(FILE *arquivo, Aerodromo *aerodromo, int linha_tabela){
     if (arquivo == NULL)
         return 0;
     
-
     rewind(arquivo);
 
     linha_atual = 0;
@@ -173,7 +172,7 @@ int ler_linha_csv(FILE *arquivo, Aerodromo *aerodromo, int linha_tabela){
                 aerodromo->altitude_em_metros = atoi(campo);
                 break;
             case COLUNA_OPERACAO_D:
-                aerodromo->regras_de_voo = criar_regra_de_voo(campo);
+                aerodromo->operacao_diurna = criar_regra_de_voo(campo);
                 break;
             case COLUNA_COMPRIMENTO:
                 if (!campo_valido(campo))
