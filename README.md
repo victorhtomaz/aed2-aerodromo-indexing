@@ -44,7 +44,7 @@ aed2-aerodromo-indexing/
 └── .gitignore                    # Arquivos ignorados pelo Git
 ```
 
-## 🚀 Compilação e Execução
+## Compilação e Execução
 
 ### **Usando Make (Recomendado)**
 
