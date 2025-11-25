@@ -125,13 +125,13 @@ A chave utilizada para os dados nas estruturas foi uma chave composta dos campos
 
 | Campo | Tipo | Descrição | Exemplo |
 |-------|------|-----------|---------|
-| Código OACI | String(4) | Identificador único | `SJ3D` |
-| Nome | String(255) | Nome do aeródromo | `FAZENDA SINIMBU` |
-| Município | String(255) | Cidade | `JABORANDI` |
-| UF | String(2) | Estado | `BA` |
-| Longitude | DMS | Coordenada Oeste/Leste | `"045°09'51""W"` |
-| Latitude | DMS | Coordenada Sul/Norte | `"13°51'59""S"` |
-| Altitude | Int | Altitude em metros | `769` |
-| Operação | Enum | VFR, IFR ou VFR/IFR | `VFR` |
-| Comprimento | Int | Comprimento pista (m) | `1500` |
-| Largura | Int | Largura pista (m) | `22` |
+| Código OACI | string | Identificador | `SJ3D` |
+| Nome | string| Nome do aeródromo | `FAZENDA SINIMBU` |
+| Município | string | Cidade | `JABORANDI` |
+| UF | string | Estado | `BA` |
+| Longitude | double | Coordenada Oeste/Leste | `"045°09'51""W"` |
+| Latitude | double | Coordenada Sul/Norte | `"13°51'59""S"` |
+| Altitude | int | Altitude em metros | `769` |
+| Operação | enum | VFR, IFR ou VFR/IFR | `VFR` |
+| Comprimento | int | Comprimento pista (m) | `1500` |
+| Largura | int | Largura pista (m) | `22` |
