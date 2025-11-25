@@ -3,7 +3,7 @@
 
 #include "aerodromo.h"
 
-#define ARQUIVO_CSV "../data/G12.csv"
+#define ARQUIVO_CSV "data/G12.csv"
 #define SEPARADOR_CSV ";\n"
 #define NUMERO_COLUNAS_CSV 10
 
